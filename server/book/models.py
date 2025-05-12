@@ -2,9 +2,9 @@ from django.db import models
 
 
 class Book(models.Model):
-    isbn = models.CharField()
-    title = models.CharField()
-    author = models.CharField()
+    isbn = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
     available_copies = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

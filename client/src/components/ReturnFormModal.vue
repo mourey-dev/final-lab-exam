@@ -1,17 +1,21 @@
 <template>
   <div
     v-if="visible"
-    class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
   >
-    <div class="bg-white rounded-lg w-full max-w-md p-6 shadow-lg">
-      <h2 class="text-xl font-semibold mb-4">Return Book</h2>
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 relative">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Return Book
+      </h2>
 
-      <form @submit.prevent="handleSubmit" class="grid gap-4">
+      <form @submit.prevent="handleSubmit" class="space-y-5">
         <div>
-          <label class="block font-medium mb-1">Borrowed Transaction</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Borrowed Transaction
+          </label>
           <select
             v-model="selectedTransactionId"
-            class="w-full border rounded px-3 py-2"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
             required
           >
             <option disabled value="">Select a transaction</option>
@@ -20,34 +24,36 @@
               :key="tx.id"
               :value="tx.id"
             >
-              {{ tx.user.first_name }} {{ tx.user.last_name }} - "{{
+              {{ tx.user.first_name }} {{ tx.user.last_name }} – “{{
                 tx.book.title
-              }}"
+              }}”
             </option>
           </select>
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Return Date</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Return Date
+          </label>
           <input
             type="date"
             v-model="returnDate"
-            class="w-full border rounded px-3 py-2"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
             required
           />
         </div>
 
-        <div class="flex justify-end gap-2 mt-4">
+        <div class="flex justify-end gap-3 pt-4">
           <button
             type="button"
             @click="close"
-            class="px-4 py-2 rounded border text-gray-600 hover:bg-gray-100"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+            class="px-5 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition"
           >
             Return
           </button>
@@ -64,8 +70,9 @@ import { toast } from "vue3-toastify";
 
 const props = defineProps({
   visible: Boolean,
-  transactions: Array, // All borrow transactions
+  transactions: Array,
 });
+
 const emit = defineEmits(["close", "saved"]);
 
 const selectedTransactionId = ref("");
@@ -94,12 +101,16 @@ async function handleSubmit() {
 
     emit("saved");
     close();
-    toast.success("Success", {
+    toast.success("Book returned successfully!", {
       autoClose: 1500,
       pauseOnFocusLoss: false,
     });
   } catch (error) {
     console.error("Return failed:", error);
+    toast.error("Failed to return book.", {
+      autoClose: 1500,
+      pauseOnFocusLoss: false,
+    });
   }
 }
 

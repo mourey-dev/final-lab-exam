@@ -1,17 +1,21 @@
 <template>
   <div
     v-if="visible"
-    class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
   >
-    <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg">
-      <h2 class="text-xl font-semibold mb-4">Borrow Book</h2>
+    <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl p-8 relative">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Borrow Book
+      </h2>
 
-      <form @submit.prevent="handleSubmit" class="grid grid-cols-2 gap-4">
-        <div class="col-span-2">
-          <label class="block font-medium mb-1">User</label>
+      <form @submit.prevent="handleSubmit" class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >User</label
+          >
           <select
             v-model="form.user"
-            class="w-full border rounded px-3 py-2"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             required
           >
             <option disabled value="">Select a user</option>
@@ -21,11 +25,13 @@
           </select>
         </div>
 
-        <div class="col-span-2">
-          <label class="block font-medium mb-1">Book</label>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Book</label
+          >
           <select
             v-model="form.book"
-            class="w-full border rounded px-3 py-2"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             required
           >
             <option disabled value="">Select a book</option>
@@ -36,26 +42,28 @@
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Date</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Date</label
+          >
           <input
             type="date"
             v-model="form.date"
-            class="w-full border rounded px-3 py-2"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             required
           />
         </div>
 
-        <div class="col-span-2 flex justify-end gap-2 mt-4">
+        <div class="flex justify-end gap-3 pt-4">
           <button
             type="button"
             @click="close"
-            class="px-4 py-2 rounded border text-gray-600 hover:bg-gray-100"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
           >
             Submit
           </button>
@@ -79,8 +87,8 @@ const emit = defineEmits(["close", "saved"]);
 const form = reactive({
   book: "",
   user: "",
-  status: "borrowed", // Fixed status to 'borrowed'
-  date: new Date().toISOString().split("T")[0], // Current date
+  status: "borrowed",
+  date: new Date().toISOString().split("T")[0],
 });
 
 const books = ref([]);
@@ -98,10 +106,11 @@ watch(
 
 async function fetchBooksAndUsers() {
   try {
-    const booksResponse = await axios.get("http://localhost:8000/api/books/");
-    const usersResponse = await axios.get("http://localhost:8000/api/users/");
+    const [booksResponse, usersResponse] = await Promise.all([
+      axios.get("http://localhost:8000/api/books/"),
+      axios.get("http://localhost:8000/api/users/"),
+    ]);
 
-    // Set books and users locally
     books.value = booksResponse.data;
     users.value = usersResponse.data;
   } catch (error) {
@@ -117,10 +126,10 @@ function resetForm() {
 
 async function handleSubmit() {
   try {
-    await axios.post("http://localhost:8000/api/borrow/", form); // Endpoint for borrowing
-    emit("saved"); // Notify parent that the book has been borrowed
-    close(); // Close modal
-    toast.success("Success", {
+    await axios.post("http://localhost:8000/api/borrow/", form);
+    emit("saved");
+    close();
+    toast.success("Book borrowed successfully!", {
       autoClose: 1500,
       pauseOnFocusLoss: false,
     });
@@ -134,7 +143,7 @@ async function handleSubmit() {
 }
 
 function close() {
-  resetForm(); // Reset the form data
-  emit("close"); // Close modal
+  resetForm();
+  emit("close");
 }
 </script>
